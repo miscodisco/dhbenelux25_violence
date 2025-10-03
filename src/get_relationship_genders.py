@@ -37,7 +37,7 @@ def main():
         # if there is only 1 slash ship
         if n_slash_ships == 1:
             for ship in relationships:
-                # because someone fucked up and added two slashes wihtout a name inbetween
+                # because someone fucked up and added two slashes without a name inbetween
                 ship = ship.replace("//", "/")
                 # find the slash ship
                 if "/" in ship:

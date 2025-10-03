@@ -1,5 +1,5 @@
-violence_tags:
-	uv run src/save_violence_tags.py
+freeform_tags:
+	uv run src/save_freeform_tags.py
 	
 get_genders:
 	uv run src/get_relationship_genders.py

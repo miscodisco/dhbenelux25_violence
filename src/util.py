@@ -17,6 +17,9 @@ def write_jsonl(object: list[dict], path: str) -> None:
 
 
 def get_fic_fandom(fandom_list: list[str]) -> str:
+    """
+    get the clean fandom label for future analysis based on the user-generated fandom tags
+    """
     LOTR_tag = "Lord of the Rings"
     HP_tag = "Harry Potter"
     PJ = "Percy Jackson"

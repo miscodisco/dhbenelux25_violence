@@ -1,7 +1,7 @@
 import pandas as pd
+from tqdm import tqdm
 
 from collections import Counter
-from tqdm import tqdm
 
 
 def main():
