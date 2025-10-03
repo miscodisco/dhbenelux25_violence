@@ -1,59 +1,49 @@
 import pandas as pd
 import gender_guesser.detector as gender_detect
+from tqdm import tqdm
 
 from collections import Counter
+from pathlib import Path
 
-from util import read_jsonl, write_jsonl
-
-
-def manual_gender_dict():
-    gender_dict = {
-        "Draco": "male",
-        "Hermione": "female",
-        "Legolas": "male",
-        "Sirius": "male",
-        "Severus": "male",
-        "Aragorn": "male",
-        "Gimli": "male",
-        "Glorfindel": "male",
-        "Erestor": "male",
-        "Faramir": "male",
-        "Eowyn": "female",
-        "Thranduil": "male",
-        "Albus": "male",
-        "Eomer": "male",
-    }
-    return gender_dict
+from util import read_jsonl, write_jsonl, manual_gender_dict, get_fic_fandom
 
 
 def main():
+    DATAPATH = Path("../../temp2.ndjson")
+    OUTPATH = Path("fics_meta.ndjson")
+
     # load gender guesser and manual dict
     g = gender_detect.Detector()
     manual_g = manual_gender_dict()
 
     # load data
-    df = read_jsonl("../../temp2.json")
+    df = read_jsonl(DATAPATH)
 
-    genders_column = []
+    # keeping track of unknown names
     unknown_names = []
 
-    for _, fic in df.iterrows():
+    # saving only metadata necessary for analysis
+    metadata = []
+
+    # let's gooo
+    for fic in tqdm(df):
+        metadata_fic = {}
         # get the relationship tags
         relationships = fic["relationship"]
 
-        # make it a list
-        relationship_list = relationships[1:-1].split(",")
         # check if there are any slash relationships (we are not interested in platonic)
-        n_slash_ships = relationships.count("/")
+        n_slash_ships = len([ship for ship in relationships if "/" in ship])
 
         # if there is only 1 slash ship
         if n_slash_ships == 1:
-            for ship in relationship_list:
+            for ship in relationships:
+                # because someone fucked up and added two slashes wihtout a name inbetween
+                ship = ship.replace("//", "/")
                 # find the slash ship
                 if "/" in ship:
                     # get the names in the ship
-                    clean_names = ship.replace("'", "")
-                    names = clean_names.split("/")
+                    clean_ship = ship.replace("'", "")
+                    names = clean_ship.split("/")
 
                     # save the genders of the names in the ship
                     genders_list = []
@@ -65,6 +55,7 @@ def main():
                         # sometimes there's a space before the name, if that is the case, select the second item
                         if first_name == "":
                             first_name = name.split(" ")[1]
+
                         # sometimes people write "Original [GENDER] Character" - so we use that gender and move on
                         if first_name == "Original":
                             gender = name.split(" ")[1].lower()
@@ -80,10 +71,9 @@ def main():
 
                         # if it's unknown, we use the manual gender dict for the most common names
                         if gender == "unknown":
-                            # unknown_names.append(first_name)
                             gender = manual_g.get(first_name, "unknown")
                             if gender == "unknown":
-                                # running a second round for the big data
+                                # if name still unknown, add it to the list
                                 unknown_names.append(first_name)
 
                         genders_list.append(gender)
@@ -97,14 +87,23 @@ def main():
         # more than one slash ship is called multiple
         elif n_slash_ships > 1:
             genders = "multiple"
-        # save the genders
-        genders_column.append(genders)
+        # save the metadata we need and the new genders
+        metadata_fic = {
+            "work_id": fic["work_id"],
+            "author": fic["author"],
+            "published": fic["published"],
+            "fandom_label": get_fic_fandom(fic["fandom"]),
+            "relationship_tags": relationships,
+            "ship_genders": genders,
+            "freeform_tags": fic["freeform"],
+        }
 
-    df["ship_genders"] = genders_column
+        metadata.append(metadata_fic)
+
+    # save the data
+    write_jsonl(metadata, OUTPATH)
 
     print(Counter(unknown_names).most_common(15))
-
-    # df.to_csv("real_9000_fics_w_genders.csv", index=False)
 
 
 if __name__ == "__main__":
