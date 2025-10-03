@@ -17,7 +17,7 @@ def main():
     manual_g = manual_gender_dict()
 
     # load data
-    df = read_jsonl(DATAPATH)
+    data = read_jsonl(DATAPATH)
 
     # keeping track of unknown names
     unknown_names = []
@@ -26,7 +26,7 @@ def main():
     metadata = []
 
     # let's gooo
-    for fic in tqdm(df):
+    for fic in tqdm(data):
         metadata_fic = {}
         # get the relationship tags
         relationships = fic["relationship"]
