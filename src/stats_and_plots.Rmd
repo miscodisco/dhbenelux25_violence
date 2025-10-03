@@ -1,0 +1,149 @@
+---
+title: "dhbenelux"
+output: html_document
+---
+
+```{r}
+pacman::p_load(tidyverse, lme4)
+```
+
+
+```{r}
+df <- read_csv("real_9000_fics_w_genders.csv")
+```
+
+```{r}
+genders_accepted = c("female_female", "male_female", "male_male")
+```
+
+```{r}
+df <- df %>%
+  mutate(ship_genders = str_replace_all(ship_genders, "female_male", "male_female")) %>% 
+  filter(ship_genders %in% genders_accepted)
+```
+
+```{r}
+df %>% 
+  group_by(fandom_label, ship_genders) %>% 
+  summarise(n = n())
+```
+
+```{r}
+df %>% 
+  ggplot(., aes(x = ship_genders, group = fandom_label)) +
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count")+
+  theme_bw() +
+  geom_text(aes(label= scales::percent(..prop.., accuracy = 0.1), 
+                y = ..prop..), 
+                stat = "count", 
+                vjust = 0)+
+  facet_wrap(~fandom_label)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.1, hjust = 1),
+        axis.text.y = element_blank(),
+        legend.position = "none")
+```
+
+
+```{r}
+df %>% 
+  group_by(ship_genders) %>% 
+  summarise(n = n())
+
+```
+
+```{r}
+df %>% 
+  group_by(ship_genders) %>% 
+  summarise(n = n())
+```
+
+```{r}
+df <- df %>% 
+  mutate(f_f = ifelse(ship_genders == "female_female", 1,0),
+         m_m = ifelse(ship_genders == "male_male", 1,0),
+         m_f = ifelse(ship_genders == "male_female", 1,0))
+```
+
+
+
+```{r}
+m1 <- glmer(m_m ~ fandom_label + (1|author), data=df, family = binomial)
+summary(m1)
+
+m2 <- glmer(f_f ~ fandom_label + (1|author), data=df, family = binomial)
+summary(m2)
+
+m3 <- glmer(m_f ~ fandom_label + (1|author), data=df, family = binomial)
+summary(m3)
+```
+
+
+
+```{r}
+df_v = read_csv("real_9000_fics_w_genders_violence.csv")
+```
+```{r}
+df_v <- df_v %>% 
+  select(work_id, author, fandom_label, ship_genders, starts_with("violence"), freeform, relationship) %>%
+  mutate(ship_genders = str_replace_all(ship_genders, "female_male", "male_female")) %>% 
+  filter(ship_genders %in% genders_accepted) 
+
+test <- df_v %>% 
+  mutate(violence_sum = rowSums(across(violence_physical:violence_captivity)))
+
+test_long <- test %>% 
+  pivot_longer(starts_with("violence"), names_to = "violence_cat", values_to = "violence_count")
+```
+
+```{r}
+test_long %>% 
+  group_by(ship_genders, violence_cat) %>% 
+  summarise(avg = mean(violence_count)) %>% 
+  arrange(desc(avg))
+```
+
+
+
+```{r}
+test_long %>% 
+  group_by(ship_genders, violence_cat) %>% 
+  summarise(avg = mean(violence_count)) %>% # add standard error 
+  ggplot(., aes(ship_genders, avg, fill = ship_genders))+
+  geom_col(position = position_dodge())+
+  facet_wrap(~violence_cat, scales = "free")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.1, hjust = 1))
+
+test_long %>% 
+  group_by(ship_genders, violence_cat, fandom_label) %>% 
+  summarise(avg = mean(violence_count), std = sd(violence_count), se = std / sqrt(length(violence_count))) %>% # add standard error 
+  ggplot(., aes(fandom_label, avg, fill = ship_genders))+
+  geom_col(position = position_dodge())+
+  geom_errorbar(aes(ymin=avg-se, ymax=avg+se), size = 0.8, width=.1, position = position_dodge(.9)) +
+  geom_point(size = 2, position = position_dodge(.9))+
+  facet_wrap(~violence_cat, scales = "free", ncol = 3)+
+  theme_bw()
+```
+
+
+```{r}
+ggplot(test_long, aes(violence_count, col = ship_genders))+
+  geom_density()+
+  facet_wrap(~violence_cat, scales = "free")
+```
+
+```{r}
+test_wo_ff <- test %>% 
+  filter(ship_genders != "female_female")
+
+poisson_test <- glmer(violence_sum ~ ship_genders*fandom_label + (1|author), data = test_wo_ff, family = poisson, nAGQ = 100)
+
+summary(poisson_test)
+```
+
+```{r}
+poisson_test <- glmer(violence_death ~ ship_genders*fandom_label + (1|author), data = test_wo_ff, family = poisson, nAGQ = 100)
+
+summary(poisson_test)
+```
+

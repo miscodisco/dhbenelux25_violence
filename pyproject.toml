@@ -1,0 +1,11 @@
+[project]
+name = "dhbenelux25-violence"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gender-guesser>=0.4.0",
+    "pandas>=2.3.3",
+    "tqdm>=4.67.1",
+]
