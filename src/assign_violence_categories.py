@@ -1,32 +1,29 @@
 import pandas as pd
 
-from tqdm import tqdm
 import json
+
+from util import read_jsonl
 
 
 def main():
     with open("violence_tags.json", "r") as f:
         violence_cats = json.load(f)
 
-    df = pd.read_csv("real_9000_fics_w_genders.csv")
+    data = read_jsonl("fics_meta.ndjson")
 
     for category in violence_cats:
         cat_tags = violence_cats[category]
 
-        temp_column_list = []
-
-        for _, fic in df.iterrows():
-            # hmm currently getting all abuse incl. child abuse, do not want
-            # need to ask julia what she did
-            fic_tags = fic["freeform"].lower()
+        for fic in data:
+            fic_tags = str(fic["freeform_tags"]).lower()
 
             fic_cat_tags = [tag for tag in cat_tags if tag in fic_tags]
 
-            temp_column_list.append(len(fic_cat_tags))
+            fic["violence_" + category] = len(fic_cat_tags)
 
-        df["violence_" + category] = temp_column_list
+    df = pd.DataFrame(data)
 
-    df.to_csv("real_9000_fics_w_genders_violence.csv", index=False)
+    df.to_csv("fics_meta.csv", index=False)
 
 
 if __name__ == "__main__":
