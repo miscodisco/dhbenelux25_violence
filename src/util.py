@@ -22,16 +22,15 @@ def get_fic_fandom(fandom_list: list[str]) -> str:
     """
     LOTR_tag = "Lord of the Rings"
     HP_tag = "Harry Potter"
-    PJ = "Percy Jackson"
+    PJ_tag = "Percy Jackson"
 
-    if any(LOTR_tag for tag in fandom_list):
-        return "LOTR"
-
-    if any(HP_tag for tag in fandom_list):
-        return "HP"
-
-    if any(PJ for tag in fandom_list):
-        return "PJ"
+    for tag in fandom_list:
+        if LOTR_tag in tag:
+            return "LOTR"
+        elif HP_tag in tag:
+            return "HP"
+        elif PJ_tag in tag:
+            return "PJ"
 
 
 def manual_gender_dict():
