@@ -20,16 +20,17 @@ def get_fic_fandom(fandom_list: list[str]) -> str:
     """
     get the clean fandom label for future analysis based on the user-generated fandom tags
     """
-    LOTR_tag = "Lord of the Rings"
-    HP_tag = "Harry Potter"
-    PJ_tag = "Percy Jackson"
+    LOTR_tag = "lord of the rings"
+    HP_tag = "harry potter"
+    PJ_tag = "percy"
 
     for tag in fandom_list:
-        if LOTR_tag in tag:
+        tag = tag.lower()
+        if LOTR_tag in tag or "hobbit" in tag or "tolkien" in tag:
             return "LOTR"
-        elif HP_tag in tag:
+        elif HP_tag in tag or "drarry" in tag:
             return "HP"
-        elif PJ_tag in tag:
+        elif PJ_tag in tag or "riordan" in tag:
             return "PJ"
 
 
