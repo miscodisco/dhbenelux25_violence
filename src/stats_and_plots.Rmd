@@ -82,6 +82,7 @@ summary(m3)
 ```{r}
 df_v = read_csv("real_9000_fics_w_genders_violence.csv")
 ```
+
 ```{r}
 df_v <- df_v %>% 
   select(work_id, author, fandom_label, ship_genders, starts_with("violence"), freeform, relationship) %>%
@@ -145,5 +146,67 @@ summary(poisson_test)
 poisson_test <- glmer(violence_death ~ ship_genders*fandom_label + (1|author), data = test_wo_ff, family = poisson, nAGQ = 100)
 
 summary(poisson_test)
+```
+
+
+```{r}
+df <- read_csv("../fics_meta.csv")
+```
+
+```{r}
+df_v <- df %>% 
+  drop_na() %>% 
+  mutate(ship_genders = str_replace_all(ship_genders, "female_male", "male_female")) %>% 
+  filter(ship_genders %in% genders_accepted) 
+
+test <- df_v %>% 
+  mutate(violence_sum = rowSums(across(violence_physical:violence_captivity)))
+
+test_long <- test %>% 
+  pivot_longer(starts_with("violence"), names_to = "violence_cat", values_to = "violence_count")
+```
+
+```{r}
+test_long %>% 
+  filter(ship_genders != "female_female") %>% 
+  group_by(ship_genders, violence_cat, fandom_label) %>% 
+  summarise(avg = mean(violence_count), std = sd(violence_count), se = std / sqrt(length(violence_count))) %>% # add standard error 
+  ggplot(., aes(fandom_label, avg, fill = ship_genders))+
+  geom_col(position = position_dodge())+
+  geom_errorbar(aes(ymin=avg-se, ymax=avg+se), size = 0.8, width=.1, position = position_dodge(.9)) +
+  geom_point(size = 2, position = position_dodge(.9))+
+  facet_wrap(~violence_cat, scales = "free", ncol = 3)+
+  theme_bw()
+```
+
+```{r}
+df_v%>% 
+  ggplot(., aes(x = ship_genders, group = fandom_label)) +
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count")+
+  theme_bw() +
+  geom_text(aes(label= scales::percent(..prop.., accuracy = 0.1), 
+                y = ..prop..), 
+                stat = "count", 
+                vjust = 0)+
+  facet_wrap(~fandom_label)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.1, hjust = 1),
+        axis.text.y = element_blank(),
+        legend.position = "none")
+```
+```{r}
+test_wo_ff <- test %>% 
+  filter(ship_genders != "female_female")
+
+poisson_test <- glmer(violence_sum ~ ship_genders*fandom_label + (1|author), data = test_wo_ff, family = poisson, nAGQ = 100)
+
+summary(poisson_test)
+```
+
+```{r}
+test_long_wo_ff <- test_long %>% 
+  filter(ship_genders != "female_female")
+
+poisson_long_test <- glmer(violence_count ~ violence_cat*ship_genders + fandom_label + (1|author), data = test_long_wo_ff, family = poisson, nAGQ = 100)
+
 ```
 
