@@ -64,5 +64,7 @@ def manual_gender_dict():
         "Bilbo": "male",
         "Galadriel": "female",
         "Bellatrix": "female",
+        "Regulus": "male",
+        "Gellert": "male"
     }
     return gender_dict
