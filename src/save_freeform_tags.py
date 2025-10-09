@@ -3,22 +3,20 @@ from tqdm import tqdm
 
 from collections import Counter
 
+from util import read_jsonl, write_jsonl
+
 
 def main():
-    df = pd.read_csv("real_9000_fics_w_genders.csv")
-
+    data = read_jsonl("fics_meta.ndjson")
     freeform_tags = []
 
-    for _, fic in df.iterrows():
-        fic_freeform = fic["freeform"][1:-1].replace("'", "")
+    for fic in data:
+        freeform_clean = [tag.strip().lower() for tag in fic["freeform_tags"]]
+        freeform_tags.extend(freeform_clean)
 
-        fic_freeform_list = [tag.strip().lower() for tag in fic_freeform.split(", ")]
+    most_popular_tags = Counter(freeform_tags).most_common(1000)
 
-        freeform_tags.extend(fic_freeform_list)
-
-    most_popular_tags = Counter(freeform_tags).most_common(500)
-
-    with open("most_common_tags_500.txt", "w") as f:
+    with open("most_common_tags_1000.txt", "w") as f:
         f.write(str(most_popular_tags))
 
 
