@@ -9,7 +9,7 @@ from util import read_jsonl, write_jsonl, manual_gender_dict, get_fic_fandom
 
 
 def main():
-    DATAPATH = Path("../../temp2.ndjson")
+    DATAPATH = Path("/work/Home/thesis/analysis/temp2.ndjson")
     OUTPATH = Path("fics_meta.ndjson")
 
     # load gender guesser and manual dict
@@ -54,7 +54,12 @@ def main():
 
                         # sometimes there's a space before the name, if that is the case, select the second item
                         if first_name == "":
-                            first_name = name.split(" ")[1]
+                            try:
+                                first_name = name.split(" ")[1]
+                            except:
+                                print(f"something with this relationship: {ship}")
+                                continue 
+
 
                         # sometimes people write "Original [GENDER] Character" - so we use that gender and move on
                         if first_name == "Original":
