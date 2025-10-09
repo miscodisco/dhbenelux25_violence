@@ -1,5 +1,4 @@
-{"physical": ["'torture'", "'spanking'", "'blood'", "'abuse'", "'injury'", "'biting'", "'choking'", "'blood and injury'", "'blood and gore'", "'blood and violence'"],
-"sexual": ["'dubious consent'", "'bondage'", "'rape'", "'implied/referenced rape/non-con'", "'rape/non-con elements'", "'light bondage'"],
-"death": ["'death'", "'murder'", "'minor character death'", "'canonical character death'"],
-"emotional": ["'emotional manipulation'", "'homophobia'", "'bullying'", "'emotional/psychological abuse'"],
-"captivity": ["'kidnapping'"]}
+{"physical": ["'torture'", "'spanking'", "'blood'", "'abuse'", "'injury'", "'violence'", "'blood and injury'", "'non-graphic violence'", "'blood and violence'", "'choking'", "'minor violence'", "'physical abuse'", "'domestic violence'", "'major characer injury'", "'implied/referenced abuse'", "'minor injuries'"],
+"sexual": ["'dubious consent'","'mildly dubious consent'", "'extremely dubious consent'","'bondage'", "'rape'", "'implied/referenced rape/non-con'", "'rape/non-con elements'", "'bdsm'", "'attempted rape/non-con", "'implied/referenced sexual assault'"],
+"death": ["'death'", "'murder'", "'character death'", "'canonical character death'", "'implied/referenced character death'"],
+"emotional": ["'manipulation'", "'homophobia'", "'bullying'", "'emotional/psychological abuse'", "'implied/referenced homophobia'", "'period-typical homophobia'", "'psychological torture'"]}
