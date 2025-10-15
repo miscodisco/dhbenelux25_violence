@@ -10,7 +10,7 @@ from util import read_jsonl, write_jsonl, manual_gender_dict, get_fic_fandom
 
 def main():
     DATAPATH = Path("/work/Home/thesis/analysis/temp2.ndjson")
-    OUTPATH = Path("fics_meta.ndjson")
+    OUTPATH = Path("data/fics_meta.ndjson")
 
     # load gender guesser and manual dict
     g = gender_detect.Detector()
@@ -98,9 +98,9 @@ def main():
             "author": fic["author"],
             "published": fic["published"],
             "fandom_label": get_fic_fandom(fic["fandom"]),
-            "relationship_tags": relationships,
-            "ship_genders": genders,
-            "freeform_tags": fic["freeform"],
+            "relationship": relationships,
+            "category": genders,
+            "freeform": fic["freeform"],
         }
 
         metadata.append(metadata_fic)

@@ -9,7 +9,7 @@ def main():
     with open("violence_tags.json", "r") as f:
         violence_cats = json.load(f)
 
-    data = read_jsonl("fics_meta.ndjson")
+    data = read_jsonl("data/fics_meta.ndjson")
 
     for category in violence_cats:
         cat_tags = violence_cats[category]
@@ -23,7 +23,7 @@ def main():
 
     df = pd.DataFrame(data)
 
-    df.to_csv("fics_meta.csv", index=False)
+    df.to_csv("data/fics_meta.csv", index=False)
 
 
 if __name__ == "__main__":
